@@ -448,6 +448,7 @@ public protocol DateTimePickerDelegate: class {
         hourTableView.delegate = self
         hourTableView.dataSource = self
         hourTableView.isHidden = isDatePickerOnly
+	hourTableView.backgroundColor = .white
         contentView.addSubview(hourTableView)
 		
         hourTableView.translatesAutoresizingMaskIntoConstraints = false
@@ -466,6 +467,7 @@ public protocol DateTimePickerDelegate: class {
         minuteTableView.delegate = self
         minuteTableView.dataSource = self
         minuteTableView.isHidden = isDatePickerOnly
+	minuteTableView.backgroundColor = .white
         contentView.addSubview(minuteTableView)
         
         minuteTableView.translatesAutoresizingMaskIntoConstraints = false
@@ -489,6 +491,7 @@ public protocol DateTimePickerDelegate: class {
         amPmTableView.delegate = self
         amPmTableView.dataSource = self
         amPmTableView.isHidden = !is12HourFormat || isDatePickerOnly
+	amPmTableView.backgroundColor = .white
         contentView.addSubview(amPmTableView)
         
         amPmTableView.translatesAutoresizingMaskIntoConstraints = false
