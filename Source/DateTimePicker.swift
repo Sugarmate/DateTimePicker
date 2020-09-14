@@ -668,9 +668,15 @@ public protocol DateTimePickerDelegate: class {
     func flipAmPm() {
         if var indexPath = amPmTableView.indexPathForSelectedRow {
             if (indexPath.row == 0) {
-                indexPath.row = 1
+                indexPath.row = 1 //pm
+                if let hour = components.hour, hour < 12 {
+                    components.hour! += 12
+                }
             } else {
-                indexPath.row = 0
+                indexPath.row = 0 //am
+                if let hour = components.hour, hour >= 12 {
+                    components.hour! -= 12
+                }
             }
             amPmTableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
         }
