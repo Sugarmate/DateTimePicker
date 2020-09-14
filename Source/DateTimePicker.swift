@@ -206,7 +206,6 @@ public protocol DateTimePickerDelegate: class {
             components.timeZone = timeZone
         }
     }
-    internal var prevDate: Date?
     
     @objc open class func create(minimumDate: Date? = nil, maximumDate: Date? = nil) -> DateTimePicker {
         
