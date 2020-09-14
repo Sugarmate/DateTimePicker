@@ -172,6 +172,7 @@ public protocol DateTimePickerDelegate: class {
     public var timeZone = TimeZone.current
     public var completionHandler: ((Date)->Void)?
     public var dismissHandler: (() -> Void)?
+    public var changeTimeHandler: ((Date) -> Void)?
     public weak var delegate: DateTimePickerDelegate?
 
     // private vars
@@ -779,7 +780,8 @@ extension DateTimePicker: UITableViewDataSource, UITableViewDelegate {
             } else {
                 selectedDate = selected
             }
-        }
+            changeTimeHandler?(selectedDate)
+        }        
     }
     
 }
