@@ -38,12 +38,6 @@ class ViewController: UIViewController, DateTimePickerDelegate {
             formatter.dateFormat = "hh:mm aa dd/MM/YYYY"
             self.title = formatter.string(from: date)
         }
-        picker.dismissHandler = {
-            
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { //prevent date flicker
-            picker.show()
-        }
         
         picker.delegate = self
         

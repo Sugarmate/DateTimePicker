@@ -219,7 +219,6 @@ public protocol DateTimePickerDelegate: class {
     
     
     @objc open func show() {
-        
 		if let window = UIApplication.shared.keyWindow {
             let shadowView = UIView()
             shadowView.backgroundColor = UIColor.black.withAlphaComponent(0.3)
@@ -242,12 +241,16 @@ public protocol DateTimePickerDelegate: class {
 			trailingAnchor.constraint(equalTo: window.trailingAnchor).isActive = true
             layoutIfNeeded()
             
+            //fix for ampm scrolling
+            amPmTableView.contentInset = UIEdgeInsets.init(top: amPmTableView.frame.height / 2, left: 0, bottom: amPmTableView.frame.height / 2, right: 0)
+            
+            self.resetTime(animated: false)
+            
             // animate to show contentView
             contentViewBottomConstraint.constant = 0
             UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.4, options: .curveEaseIn, animations: {
                 self.layoutIfNeeded()
             }, completion: { completed in
-                self.resetTime()
             })
             
             modalCloseHandler = {
@@ -449,7 +452,7 @@ public protocol DateTimePickerDelegate: class {
         hourTableView.delegate = self
         hourTableView.dataSource = self
         hourTableView.isHidden = isDatePickerOnly
-	hourTableView.backgroundColor = .white
+        hourTableView.backgroundColor = .white
         contentView.addSubview(hourTableView)
 		
         hourTableView.translatesAutoresizingMaskIntoConstraints = false
@@ -458,7 +461,6 @@ public protocol DateTimePickerDelegate: class {
         let extraSpace: CGFloat = is12HourFormat ? -30 : 0
         hourTableView.trailingAnchor.constraint(equalTo: contentView.centerXAnchor, constant: extraSpace).isActive = true
         hourTableView.widthAnchor.constraint(equalToConstant: 60).isActive = true
-        hourTableView.layoutIfNeeded()
         
         // minute table view
         minuteTableView = UITableView(frame: CGRect.zero, style: .plain)
@@ -468,7 +470,7 @@ public protocol DateTimePickerDelegate: class {
         minuteTableView.delegate = self
         minuteTableView.dataSource = self
         minuteTableView.isHidden = isDatePickerOnly
-	minuteTableView.backgroundColor = .white
+        minuteTableView.backgroundColor = .white
         contentView.addSubview(minuteTableView)
         
         minuteTableView.translatesAutoresizingMaskIntoConstraints = false
@@ -477,7 +479,6 @@ public protocol DateTimePickerDelegate: class {
         minuteTableView.leadingAnchor.constraint(equalTo: contentView.centerXAnchor, constant: extraSpace).isActive = true
         minuteTableView.widthAnchor.constraint(equalToConstant: 60).isActive = true
         
-        minuteTableView.layoutIfNeeded()
         if timeInterval != .default {
             minuteTableView.contentInset = UIEdgeInsets.init(top: minuteTableView.frame.height / 2, left: 0, bottom: minuteTableView.frame.height / 2, right: 0)
         } else {
@@ -492,7 +493,7 @@ public protocol DateTimePickerDelegate: class {
         amPmTableView.delegate = self
         amPmTableView.dataSource = self
         amPmTableView.isHidden = !is12HourFormat || isDatePickerOnly
-	amPmTableView.backgroundColor = .white
+        amPmTableView.backgroundColor = .white
         contentView.addSubview(amPmTableView)
         
         amPmTableView.translatesAutoresizingMaskIntoConstraints = false
@@ -500,10 +501,7 @@ public protocol DateTimePickerDelegate: class {
         amPmTableView.bottomAnchor.constraint(equalTo: doneButton.topAnchor, constant: -8).isActive = true
         amPmTableView.leadingAnchor.constraint(equalTo: contentView.centerXAnchor, constant: -extraSpace).isActive = true
         amPmTableView.widthAnchor.constraint(equalToConstant: 64).isActive = true
-        
-        amPmTableView.layoutIfNeeded()
-        amPmTableView.contentInset = UIEdgeInsets.init(top: amPmTableView.frame.height / 2, left: 0, bottom: amPmTableView.frame.height / 2, right: 0)
-        
+                        
         // colon
         colonLabel1 = UILabel(frame: CGRect.zero)
         colonLabel1.text = ":"
@@ -567,8 +565,7 @@ public protocol DateTimePickerDelegate: class {
         }
         components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: selectedDate)
         contentView.isHidden = false
-        
-		layoutIfNeeded()
+
         resetTime()
     }
     
@@ -579,7 +576,7 @@ public protocol DateTimePickerDelegate: class {
         resetTime()
     }
     
-    func resetTime() {
+    func resetTime(animated: Bool = true) {
         components = calendar.dateComponents([.day, .month, .year, .hour, .minute], from: selectedDate)
         updateCollectionView(to: selectedDate)
         if let hour = components.hour {
@@ -596,11 +593,11 @@ public protocol DateTimePickerDelegate: class {
                     expectedRow = 23
                 }
             }
-            hourTableView.selectRow(at: IndexPath(row: expectedRow, section: 0), animated: true, scrollPosition: .middle)
+            hourTableView.selectRow(at: IndexPath(row: expectedRow, section: 0), animated: animated, scrollPosition: .middle)
             if hour >= 12 {
-                amPmTableView.selectRow(at: IndexPath(row: 1, section: 0), animated: true, scrollPosition: .middle)
+                amPmTableView.selectRow(at: IndexPath(row: 1, section: 0), animated: animated, scrollPosition: .middle)
             } else {
-                amPmTableView.selectRow(at: IndexPath(row: 0, section: 0), animated: true, scrollPosition: .middle)
+                amPmTableView.selectRow(at: IndexPath(row: 0, section: 0), animated: animated, scrollPosition: .middle)
             }
         }
         
@@ -610,7 +607,7 @@ public protocol DateTimePickerDelegate: class {
                 expectedRow = expectedRow == 0 ? 120 : expectedRow + 60 // workaround for issue when minute = 0
             }
             
-            minuteTableView.selectRow(at: IndexPath(row: expectedRow, section: 0), animated: true, scrollPosition: .middle)
+            minuteTableView.selectRow(at: IndexPath(row: expectedRow, section: 0), animated: animated, scrollPosition: .middle)
         }
     }
     
@@ -763,6 +760,13 @@ extension DateTimePicker: UITableViewDataSource, UITableViewDelegate {
             if is12HourFormat {
                 let prevHour = components.hour ?? -1
                 components.hour = indexPath.row < 12 ? indexPath.row + 1 : (indexPath.row - 12)%12 + 1
+                if let hour = components.hour,
+                    amPmTableView.indexPathForSelectedRow?.row == 0 && hour >= 12 {
+                    components.hour! -= 12
+                } else if let hour = components.hour,
+                    amPmTableView.indexPathForSelectedRow?.row == 1 && hour < 12 {
+                    components.hour! += 12
+                }
                 if let hour = components.hour {
                     if ([11,23].contains(prevHour) && [0,12].contains(hour)) || ([0,12].contains(prevHour) && [11,23].contains(hour)) {
                         flipAmPm()
