@@ -172,7 +172,6 @@ public protocol DateTimePickerDelegate: class {
     public var timeZone = TimeZone.current
     public var completionHandler: ((Date)->Void)?
     public var dismissHandler: (() -> Void)?
-    public var changeTimeHandler: ((Date) -> Void)?
     public weak var delegate: DateTimePickerDelegate?
 
     // private vars
@@ -207,6 +206,7 @@ public protocol DateTimePickerDelegate: class {
             components.timeZone = timeZone
         }
     }
+    internal var prevDate: Date?
     
     @objc open class func create(minimumDate: Date? = nil, maximumDate: Date? = nil) -> DateTimePicker {
         
@@ -237,6 +237,7 @@ public protocol DateTimePickerDelegate: class {
 			translatesAutoresizingMaskIntoConstraints = false
 			topAnchor.constraint(equalTo: window.topAnchor).isActive = true
             let contentViewBottomConstraint = bottomAnchor.constraint(equalTo: window.bottomAnchor, constant: contentHeight)
+            contentViewBottomConstraint.priority = .defaultLow
             contentViewBottomConstraint.isActive = true
 			leadingAnchor.constraint(equalTo: window.leadingAnchor).isActive = true
 			trailingAnchor.constraint(equalTo: window.trailingAnchor).isActive = true
@@ -665,6 +666,17 @@ public protocol DateTimePickerDelegate: class {
         }
     }
     
+    func flipAmPm() {
+        if var indexPath = amPmTableView.indexPathForSelectedRow {
+            if (indexPath.row == 0) {
+                indexPath.row = 1
+            } else {
+                indexPath.row = 0
+            }
+            amPmTableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
+        }
+    }
+    
     @objc
     public func dismissView(sender: UIButton?=nil) {
         modalCloseHandler?()
@@ -744,13 +756,12 @@ extension DateTimePicker: UITableViewDataSource, UITableViewDelegate {
         tableView.selectRow(at: IndexPath(row: selectedRow, section: 0), animated: shouldAnimate, scrollPosition: .middle)
         if tableView == hourTableView {
             if is12HourFormat {
+                let prevHour = components.hour ?? -1
                 components.hour = indexPath.row < 12 ? indexPath.row + 1 : (indexPath.row - 12)%12 + 1
-                if let hour = components.hour,
-                    amPmTableView.indexPathForSelectedRow?.row == 0 && hour >= 12 {
-                    components.hour! -= 12
-                } else if let hour = components.hour,
-                    amPmTableView.indexPathForSelectedRow?.row == 1 && hour < 12 {
-                    components.hour! += 12
+                if let hour = components.hour {
+                    if ([11,23].contains(prevHour) && [0,12].contains(hour)) || ([0,12].contains(prevHour) && [11,23].contains(hour)) {
+                        flipAmPm()
+                    }
                 }
             } else {
                 components.hour = indexPath.row < 24 ? indexPath.row : (indexPath.row - 24)%24
@@ -780,7 +791,6 @@ extension DateTimePicker: UITableViewDataSource, UITableViewDelegate {
             } else {
                 selectedDate = selected
             }
-            changeTimeHandler?(selectedDate)
         }        
     }
     
