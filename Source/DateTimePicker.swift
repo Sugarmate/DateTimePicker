@@ -922,6 +922,7 @@ extension DateTimePicker: UICollectionViewDataSource, UICollectionViewDelegate {
             tableView.selectRow(at: IndexPath(row: selectedRow, section: 0), animated: false, scrollPosition: .middle)
             if tableView == hourTableView {
                 if is12HourFormat {
+                    let prevHour = components.hour ?? -1
                     components.hour = selectedRow < 12 ? selectedRow + 1 : (selectedRow - 12)%12 + 1
                     if let hour = components.hour,
                         amPmTableView.indexPathForSelectedRow?.row == 0 && hour >= 12 {
@@ -929,6 +930,11 @@ extension DateTimePicker: UICollectionViewDataSource, UICollectionViewDelegate {
                     } else if let hour = components.hour,
                         amPmTableView.indexPathForSelectedRow?.row == 1 && hour < 12 {
                         components.hour! += 12
+                    }
+                    if let hour = components.hour {
+                        if ([11,23].contains(prevHour) && [0,12].contains(hour)) || ([0,12].contains(prevHour) && [11,23].contains(hour)) {
+                            flipAmPm()
+                        }
                     }
                 } else {
                     components.hour = selectedRow < 24 ? selectedRow : (selectedRow - 24)%24
