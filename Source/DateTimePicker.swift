@@ -284,7 +284,7 @@ public protocol DateTimePickerDelegate: class {
         }
     }
     
-    private func configureView() {
+    open func configureView(width: CGFloat? = nil) {
         
         // content view
         if (contentView != nil) {
@@ -292,7 +292,9 @@ public protocol DateTimePickerDelegate: class {
         }
         
         contentHeight = isDatePickerOnly ? 228 : isTimePickerOnly ? 230 : 330
-        if let window = UIApplication.shared.keyWindow {
+        if let width = width {
+            self.frame.size.width = width
+        } else if let window = UIApplication.shared.keyWindow {
             self.frame.size.width = window.bounds.size.width
         }
         self.frame.size.height = contentHeight
@@ -576,7 +578,7 @@ public protocol DateTimePickerDelegate: class {
         resetTime()
     }
     
-    func resetTime(animated: Bool = true) {
+    open func resetTime(animated: Bool = true) {
         components = calendar.dateComponents([.day, .month, .year, .hour, .minute], from: selectedDate)
         updateCollectionView(to: selectedDate)
         if let hour = components.hour {
