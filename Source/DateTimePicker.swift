@@ -313,7 +313,7 @@ public protocol DateTimePickerDelegate: class {
         contentView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         contentView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         contentView.heightAnchor.constraint(equalToConstant: contentHeight).isActive = true
-        contentView.layoutMargins = UIEdgeInsets.init(top: 0, left: 20, bottom: 0, right: 20)
+        contentView.layoutMargins = UIEdgeInsets.init(top: 0, left: 10, bottom: 0, right: 10)
         
         // title view
         let titleView = UIView(frame: CGRect.zero)
@@ -325,7 +325,7 @@ public protocol DateTimePickerDelegate: class {
         titleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         titleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         titleView.heightAnchor.constraint(equalToConstant: 44).isActive = true
-        titleView.layoutMargins = UIEdgeInsets.init(top: 0, left: 20, bottom: 0, right: 20)
+        titleView.layoutMargins = UIEdgeInsets.init(top: 0, left: 10, bottom: 0, right: 10)
         
         dateTitleLabel = UILabel(frame: CGRect.zero)
         dateTitleLabel.font = UIFont.systemFont(ofSize: 15)
@@ -432,7 +432,7 @@ public protocol DateTimePickerDelegate: class {
         doneButton.setTitle(doneButtonTitle, for: .normal)
         doneButton.setTitleColor(.white, for: .normal)
         doneButton.backgroundColor = doneBackgroundColor ?? darkColor.withAlphaComponent(0.5)
-        doneButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 13)
+        doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 18)
         doneButton.layer.cornerRadius = 3
         doneButton.layer.masksToBounds = true
         doneButton.addTarget(self, action: #selector(DateTimePicker.donePicking(sender:)), for: .touchUpInside)
