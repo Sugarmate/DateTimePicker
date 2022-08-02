@@ -347,7 +347,7 @@ public protocol DateTimePickerDelegate: class {
         cancelButton.setTitleColor(darkColor.withAlphaComponent(0.5), for: .normal)
         cancelButton.contentHorizontalAlignment = isRTL ? .right : .left
         cancelButton.addTarget(self, action: #selector(DateTimePicker.dismissView(sender:)), for: .touchUpInside)
-        cancelButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        cancelButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
         titleView.addSubview(cancelButton)
         
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
@@ -361,7 +361,7 @@ public protocol DateTimePickerDelegate: class {
         todayButton.setTitleColor(highlightColor, for: .normal)
         todayButton.addTarget(self, action: #selector(DateTimePicker.setToday), for: .touchUpInside)
         todayButton.contentHorizontalAlignment = isRTL ? .left : .right
-        todayButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        todayButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
         todayButton.isHidden = self.minimumDate.compare(Date()) == .orderedDescending || self.maximumDate.compare(Date()) == .orderedAscending
         titleView.addSubview(todayButton)
         
