@@ -14,7 +14,6 @@ public protocol DateTimePickerDelegate: class {
 
 @objc public class DateTimePicker: UIView {
     
-    var contentHeight: CGFloat = 290
     @objc public enum MinuteInterval: Int {
         case `default` = 1
         case five = 5
@@ -216,7 +215,11 @@ public protocol DateTimePickerDelegate: class {
         dateTimePicker.configureView()
         return dateTimePicker
     }
-    
+
+    @objc open func fixAmPm() {
+        //fix for ampm scrolling
+        amPmTableView.contentInset = UIEdgeInsets.init(top: amPmTableView.frame.height / 2, left: 0, bottom: amPmTableView.frame.height / 2, right: 0)
+    }
     
     @objc open func show() {
 		if let window = UIApplication.shared.keyWindow {
@@ -234,15 +237,18 @@ public protocol DateTimePickerDelegate: class {
             window.addSubview(self)
 			translatesAutoresizingMaskIntoConstraints = false
 			topAnchor.constraint(equalTo: window.topAnchor).isActive = true
-            let contentViewBottomConstraint = bottomAnchor.constraint(equalTo: window.bottomAnchor, constant: contentHeight)
-            contentViewBottomConstraint.priority = .defaultLow
-            contentViewBottomConstraint.isActive = true
 			leadingAnchor.constraint(equalTo: window.leadingAnchor).isActive = true
 			trailingAnchor.constraint(equalTo: window.trailingAnchor).isActive = true
+            contentView.isHidden = true
             layoutIfNeeded()
-            
-            //fix for ampm scrolling
-            amPmTableView.contentInset = UIEdgeInsets.init(top: amPmTableView.frame.height / 2, left: 0, bottom: amPmTableView.frame.height / 2, right: 0)
+
+            let contentViewBottomConstraint = bottomAnchor.constraint(equalTo: window.bottomAnchor, constant: contentView.frame.height)
+            contentViewBottomConstraint.priority = .defaultLow
+            contentViewBottomConstraint.isActive = true
+            contentView.isHidden = false
+            layoutIfNeeded()
+
+            self.fixAmPm()
             
             self.resetTime(animated: false)
             
@@ -254,10 +260,10 @@ public protocol DateTimePickerDelegate: class {
             })
             
             modalCloseHandler = {
-                contentViewBottomConstraint.constant = self.contentHeight
+                contentViewBottomConstraint.constant = self.contentView.frame.height + window.safeAreaInsets.bottom
                 UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.8, options: .curveLinear, animations: {
                     // animate to hide pickerView
-		    shadowView.alpha = 0
+                    shadowView.alpha = 0
                     self.layoutIfNeeded()
                 }, completion: { (completed) in
                     self.removeFromSuperview()
@@ -285,20 +291,17 @@ public protocol DateTimePickerDelegate: class {
     }
     
     open func configureView(width: CGFloat? = nil) {
-        
         // content view
         if (contentView != nil) {
             contentView.removeFromSuperview()
         }
-        
-        contentHeight = isDatePickerOnly ? 228 : isTimePickerOnly ? 230 : 290
+
         if let width = width {
             self.frame.size.width = width
         } else if let window = UIApplication.shared.keyWindow {
             self.frame.size.width = window.bounds.size.width
         }
-        self.frame.size.height = contentHeight
-        
+
         contentView = UIView(frame: CGRect.zero)
         contentView.layer.shadowColor = UIColor(white: 0, alpha: 0.3).cgColor
         contentView.layer.shadowOffset = CGSize(width: 0, height: -2.0)
@@ -312,9 +315,8 @@ public protocol DateTimePickerDelegate: class {
         contentView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         contentView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         contentView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        contentView.heightAnchor.constraint(equalToConstant: contentHeight).isActive = true
         contentView.layoutMargins = UIEdgeInsets.init(top: 0, left: 10, bottom: 0, right: 10)
-        
+
         // title view
         let titleView = UIView(frame: CGRect.zero)
         titleView.backgroundColor = .white
@@ -328,7 +330,7 @@ public protocol DateTimePickerDelegate: class {
         titleView.layoutMargins = UIEdgeInsets.init(top: 0, left: 10, bottom: 0, right: 10)
         
         dateTitleLabel = UILabel(frame: CGRect.zero)
-        dateTitleLabel.font = UIFont.systemFont(ofSize: 15)
+        dateTitleLabel.font = UIFont.systemFont(ofSize: 18)
         dateTitleLabel.textColor = darkColor
         dateTitleLabel.textAlignment = .center
         resetDateTitle()
@@ -338,14 +340,14 @@ public protocol DateTimePickerDelegate: class {
         dateTitleLabel.centerYAnchor.constraint(equalTo: titleView.centerYAnchor).isActive = true
         dateTitleLabel.centerXAnchor.constraint(equalTo: titleView.centerXAnchor).isActive = true
         
-	let isRTL = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
+        let isRTL = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
 
         cancelButton = UIButton(type: .system)
         cancelButton.setTitle(cancelButtonTitle, for: .normal)
         cancelButton.setTitleColor(darkColor.withAlphaComponent(0.5), for: .normal)
         cancelButton.contentHorizontalAlignment = isRTL ? .right : .left
         cancelButton.addTarget(self, action: #selector(DateTimePicker.dismissView(sender:)), for: .touchUpInside)
-        cancelButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 15)
+        cancelButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
         titleView.addSubview(cancelButton)
         
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
@@ -359,7 +361,7 @@ public protocol DateTimePickerDelegate: class {
         todayButton.setTitleColor(highlightColor, for: .normal)
         todayButton.addTarget(self, action: #selector(DateTimePicker.setToday), for: .touchUpInside)
         todayButton.contentHorizontalAlignment = isRTL ? .left : .right
-        todayButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 15)
+        todayButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
         todayButton.isHidden = self.minimumDate.compare(Date()) == .orderedDescending || self.maximumDate.compare(Date()) == .orderedAscending
         titleView.addSubview(todayButton)
         
@@ -439,7 +441,7 @@ public protocol DateTimePickerDelegate: class {
         contentView.addSubview(doneButton)
         
         doneButton.translatesAutoresizingMaskIntoConstraints = false
-        doneButton.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4 - 32).isActive = true
+        doneButton.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.bottomAnchor, constant: -4 - 32).isActive = true
         doneButton.heightAnchor.constraint(equalToConstant: 32).isActive = true
         doneButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor, constant: 0).isActive = true
         doneButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor, constant: 0).isActive = true
@@ -463,6 +465,10 @@ public protocol DateTimePickerDelegate: class {
         let extraSpace: CGFloat = is12HourFormat ? -30 : 0
         hourTableView.trailingAnchor.constraint(equalTo: contentView.centerXAnchor, constant: extraSpace).isActive = true
         hourTableView.widthAnchor.constraint(equalToConstant: 60).isActive = true
+
+        if !isDatePickerOnly {
+            hourTableView.heightAnchor.constraint(equalToConstant: 105).isActive = true
+        }
         
         // minute table view
         minuteTableView = UITableView(frame: CGRect.zero, style: .plain)
@@ -566,6 +572,10 @@ public protocol DateTimePickerDelegate: class {
             }
         }
         components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: selectedDate)
+
+        contentView.layoutIfNeeded()
+        self.frame.size.height = contentView.frame.height
+
         contentView.isHidden = false
 
         resetTime()
