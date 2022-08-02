@@ -14,7 +14,7 @@ public protocol DateTimePickerDelegate: class {
 
 @objc public class DateTimePicker: UIView {
     
-    var contentHeight: CGFloat = 330
+    var contentHeight: CGFloat = 290
     @objc public enum MinuteInterval: Int {
         case `default` = 1
         case five = 5
@@ -291,7 +291,7 @@ public protocol DateTimePickerDelegate: class {
             contentView.removeFromSuperview()
         }
         
-        contentHeight = isDatePickerOnly ? 228 : isTimePickerOnly ? 230 : 330
+        contentHeight = isDatePickerOnly ? 228 : isTimePickerOnly ? 230 : 290
         if let width = width {
             self.frame.size.width = width
         } else if let window = UIApplication.shared.keyWindow {
@@ -439,8 +439,8 @@ public protocol DateTimePickerDelegate: class {
         contentView.addSubview(doneButton)
         
         doneButton.translatesAutoresizingMaskIntoConstraints = false
-        doneButton.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10 - 44 - 10).isActive = true
-        doneButton.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        doneButton.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4 - 32).isActive = true
+        doneButton.heightAnchor.constraint(equalToConstant: 32).isActive = true
         doneButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor, constant: 0).isActive = true
         doneButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor, constant: 0).isActive = true
         
@@ -459,7 +459,7 @@ public protocol DateTimePickerDelegate: class {
 		
         hourTableView.translatesAutoresizingMaskIntoConstraints = false
         hourTableView.topAnchor.constraint(equalTo: borderBottomView.bottomAnchor, constant: 1).isActive = true
-        hourTableView.bottomAnchor.constraint(equalTo: doneButton.topAnchor, constant: -8).isActive = true
+        hourTableView.bottomAnchor.constraint(equalTo: doneButton.topAnchor, constant: -4).isActive = true
         let extraSpace: CGFloat = is12HourFormat ? -30 : 0
         hourTableView.trailingAnchor.constraint(equalTo: contentView.centerXAnchor, constant: extraSpace).isActive = true
         hourTableView.widthAnchor.constraint(equalToConstant: 60).isActive = true
@@ -477,7 +477,7 @@ public protocol DateTimePickerDelegate: class {
         
         minuteTableView.translatesAutoresizingMaskIntoConstraints = false
         minuteTableView.topAnchor.constraint(equalTo: borderBottomView.bottomAnchor, constant: 1).isActive = true
-        minuteTableView.bottomAnchor.constraint(equalTo: doneButton.topAnchor, constant: -8).isActive = true
+        minuteTableView.bottomAnchor.constraint(equalTo: doneButton.topAnchor, constant: -4).isActive = true
         minuteTableView.leadingAnchor.constraint(equalTo: contentView.centerXAnchor, constant: extraSpace).isActive = true
         minuteTableView.widthAnchor.constraint(equalToConstant: 60).isActive = true
         
@@ -500,7 +500,7 @@ public protocol DateTimePickerDelegate: class {
         
         amPmTableView.translatesAutoresizingMaskIntoConstraints = false
         amPmTableView.topAnchor.constraint(equalTo: borderBottomView.bottomAnchor, constant: 1).isActive = true
-        amPmTableView.bottomAnchor.constraint(equalTo: doneButton.topAnchor, constant: -8).isActive = true
+        amPmTableView.bottomAnchor.constraint(equalTo: doneButton.topAnchor, constant: -4).isActive = true
         amPmTableView.leadingAnchor.constraint(equalTo: contentView.centerXAnchor, constant: -extraSpace).isActive = true
         amPmTableView.widthAnchor.constraint(equalToConstant: 64).isActive = true
                         
